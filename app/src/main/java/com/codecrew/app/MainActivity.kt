@@ -13,7 +13,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.codecrew.app.login.LoginScreen
-/*import com.codecrew.app.utils.UserPreferences*/
+import com.codecrew.app.utils.UserPreferences
 import com.codecrew.app.navigation.Screen
 import com.codecrew.app.sing_up.SignUpScreen
 
@@ -24,12 +24,12 @@ class MainActivity : ComponentActivity() {
             var startDestination by remember { mutableStateOf<String?>(null) }
 
             LaunchedEffect(key1 = Unit) { // Run once on composition
-                /*val hasSignedUp = UserPreferences.hasCompletedSignUp(applicationContext)
+                val hasSignedUp = UserPreferences.hasCompletedSignUp(applicationContext)
                 startDestination = if (hasSignedUp) {
                     Screen.Login.route
                 } else {
                     Screen.SignUp.route
-                }*/
+                }
             }
 
             if (startDestination != null) {
