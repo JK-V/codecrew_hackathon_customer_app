@@ -2,6 +2,7 @@ package com.codecrew.app
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
@@ -14,12 +15,21 @@ import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.azure.android.communication.calling.CallAgent
+import com.azure.android.communication.calling.CallAgentOptions
+import com.azure.android.communication.calling.CallClient
+import com.azure.android.communication.calling.CallClientOptions
+import com.azure.android.communication.calling.TelecomManagerOptions
+import com.azure.android.communication.common.CommunicationTokenCredential
 import com.codecrew.app.login.LoginScreen
 import com.codecrew.app.utils.UserPreferences
 import com.codecrew.app.navigation.Screen
 import com.codecrew.app.sing_up.SignUpScreen
+import com.codecrew.app.utils.CallAgentGenerator
+import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -48,6 +58,9 @@ class MainActivity : ComponentActivity() {
             add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
             add(android.Manifest.permission.READ_PHONE_STATE)
         }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            requiredPermissions.add(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
         val permissionsToAskFor = mutableListOf<String>()
 
         for (requiredPermission in requiredPermissions) {
@@ -58,6 +71,28 @@ class MainActivity : ComponentActivity() {
 
         if (permissionsToAskFor.isNotEmpty()) {
             ActivityCompat.requestPermissions(this@MainActivity, permissionsToAskFor.toTypedArray(), 1);
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+        deviceId: Int
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults, deviceId)
+        Log.d("ACS", "inside onRequestPermissionsResult")
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.d("ACS", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+
+            // Get new FCM registration token
+            val token = task.result
+            Log.d("ACS", "Current FCM Token: $token")
+
+            CallAgentGenerator.getInstance(this).getCallAgent().registerPushNotification(token)
         }
     }
 }

@@ -1,12 +1,14 @@
 package com.codecrew.app
 
 import android.util.Log
+import com.azure.android.communication.calling.PushNotificationInfo
+import com.codecrew.app.utils.CallAgentGenerator
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
-    private val TAG = "MyFirebaseMsgService"
+    private val TAG = "ACS MyFirebaseMsgService"
 
     /**
      * Called when a message is received.
@@ -14,30 +16,29 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      * @param remoteMessage Object representing the message received from Firebase Cloud Messaging.
      */
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // This is where you'll handle incoming messages.
-        // Not all messages trigger onMessageReceived - see documentation for details.
-        // For example, notification messages delivered when the app is in the background
-        // are handled by the system tray. When the user taps the notification, the app
-        // is opened, and data associated with the notification (if any) is available
-        // in the intent extras of the launching Activity.
-
         Log.d(TAG, "From: ${remoteMessage.from}")
 
+        Log.d(TAG, "Message data payload: " + remoteMessage.data)
         // Check if message contains a data payload.
         remoteMessage.data.isNotEmpty().let {
-            Log.d(TAG, "Message data payload: " + remoteMessage.data)
-            // Handle data payload here (e.g., for background processing or custom UI)
-            // You could schedule a job, update local data, etc.
-            // Example: if (remoteMessage.data["type"] == "new_message") { ... }
+            try {
+                /*val notification: IncomingCallInformation =
+                    IncomingCallInformation.fromMap(pushNotificationMessageDataFromFCM)
+                val handlePushNotificationFuture: Future =
+                    callAgent.handlePushNotification(notification).get()*/
+
+
+                CallAgentGenerator.getInstance(this).getCallAgent().handlePushNotification(
+                    PushNotificationInfo.fromMap(remoteMessage.data))
+            } catch (e: Exception) {
+                println("Something went wrong while handling the Incoming Calls Push Notifications.")
+            }
+
         }
 
         // Check if message contains a notification payload.
         remoteMessage.notification?.let {
             Log.d(TAG, "Message Notification Body: ${it.body}")
-            // If the app is in the foreground, you might want to show a custom notification
-            // or update UI directly. If in background, this is usually handled by system tray.
-            // This method is called if the app is in foreground when notification arrives.
-            //sendNotification(it.title, it.body)
         }
     }
 
@@ -56,8 +57,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendRegistrationToServer(token: String?) {
-        // TODO: Implement this method to send token to your app server.
-        Log.d(TAG, "sendRegistrationTokenToServer($token)")
+        CallAgentGenerator.getInstance(this).getCallAgent().registerPushNotification(token)
     }
 
     /**

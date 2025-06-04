@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.codecrew.app"
-        minSdk = 24
+        minSdk = 25
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
