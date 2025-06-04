@@ -2,15 +2,26 @@ package com.codecrew.app.sing_up
 
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.codecrew.app.model.CustomerData
+import com.codecrew.app.model.RetrofitClient
+import com.codecrew.app.model.RetrofitInterface
 import com.codecrew.app.utils.EmailValidator
 import com.codecrew.app.utils.UserPreferences
+import com.google.gson.Gson
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SignUpViewModel(
     application: Application,
@@ -58,21 +69,41 @@ class SignUpViewModel(
 
         _uiState.update { it.copy(isSignUpInProgress = true, signUpError = null) }
 
+        val customerApi = RetrofitClient.create()
+
         viewModelScope.launch {
             try {
-                kotlinx.coroutines.delay(2000)
+                val response: CustomerData = customerApi.signupCustomer(
+                    customerData = CustomerData(
+                    firstName = "Dummiyaapa",
+                    lastName = "Dummiyaapa",
+                    email = _uiState.value.email,
+                    userIdentity = _uiState.value.email,
+                    userAccessToken = "This is not available"
+                ))
 
-                UserPreferences.saveRegisteredEmail(
-                    appApplication.applicationContext,
-                    _uiState.value.email
-                )
-                UserPreferences.setHasCompletedSignUp(appApplication.applicationContext, true)
+                Log.i("SignupModel", "--Jaye onResponse ${response.toString()}")
 
-                _uiState.update {
-                    it.copy(
-                        isSignUpInProgress = false,
-                        isSignUpSuccessful = true
+                if(response != null){
+                    UserPreferences.saveRegisteredEmail(
+                        appApplication.applicationContext,
+                        _uiState.value.email
                     )
+                    UserPreferences.setHasCompletedSignUp(appApplication.applicationContext, true)
+
+                    _uiState.update {
+                        it.copy(
+                            isSignUpInProgress = false,
+                            isSignUpSuccessful = true
+                        )
+                    }
+                }else{
+                    _uiState.update {
+                        it.copy(
+                            isSignUpInProgress = false,
+                            isSignUpSuccessful = false
+                        )
+                    }
                 }
 
             } catch (e: Exception) {

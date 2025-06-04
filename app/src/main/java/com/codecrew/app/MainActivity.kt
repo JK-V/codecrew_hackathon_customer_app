@@ -2,6 +2,7 @@ package com.codecrew.app
 
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
@@ -15,9 +16,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.codecrew.app.login.LoginScreen
+import com.codecrew.app.model.CustomerData
+import com.codecrew.app.model.RetrofitClient
 import com.codecrew.app.utils.UserPreferences
 import com.codecrew.app.navigation.Screen
 import com.codecrew.app.sing_up.SignUpScreen
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
