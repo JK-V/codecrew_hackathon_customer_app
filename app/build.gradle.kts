@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.inappcalling"
+    namespace = "com.codecrew.app"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.inappcalling"
+        applicationId = "com.codecrew.app"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
