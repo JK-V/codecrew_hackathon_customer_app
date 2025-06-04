@@ -1,8 +1,6 @@
-package com.codecrew.app.login
+package com.codecrew.app.sing_up
 
 import android.app.Application
-import com.codecrew.app.PreferredDeviceDialog
-import com.codecrew.app.navigation.Screen
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -18,26 +16,26 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-
+import com.codecrew.app.navigation.Screen
 
 @Composable
-fun LoginScreen(
+fun SignUpScreen(
     navController: NavController,
-    loginViewModel: LoginViewModel = viewModel(
+    signUpViewModel: SignUpViewModel = viewModel(
         factory = ViewModelProvider.AndroidViewModelFactory.getInstance(
             LocalContext.current.applicationContext as Application
         )
     )
 ) {
-    val uiState by loginViewModel.uiState.collectAsState()
+    val uiState by signUpViewModel.uiState.collectAsState()
     val focusManager = LocalFocusManager.current
 
-    LaunchedEffect(uiState.isLoginSuccessful) {
-        if (uiState.isLoginSuccessful) {
-            navController.navigate(Screen.Main.route) {
-                popUpTo(Screen.Login.route) { inclusive = true } // Clear login from backstack
+    LaunchedEffect(uiState.isSignUpSuccessful) {
+        if (uiState.isSignUpSuccessful) {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(Screen.SignUp.route) { inclusive = true }
             }
-            loginViewModel.onLoginNavigationConsumed() // Reset the flag
+            signUpViewModel.onSignUpNavigationConsumed() // Reset the flag
         }
     }
 
@@ -49,12 +47,12 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Login", style = MaterialTheme.typography.headlineMedium)
+            Text("Sign Up", style = MaterialTheme.typography.headlineMedium)
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
                 value = uiState.email,
-                onValueChange = { loginViewModel.onEmailChanged(it) },
+                onValueChange = { signUpViewModel.onEmailChanged(it) },
                 label = { Text("Email") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -71,13 +69,13 @@ fun LoginScreen(
 
             OutlinedTextField(
                 value = uiState.password,
-                onValueChange = { loginViewModel.onPasswordChanged(it) },
+                onValueChange = { signUpViewModel.onPasswordChanged(it) },
                 label = { Text("Password") },
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
+                    imeAction = ImeAction.Next
                 ),
                 isError = uiState.passwordError != null,
                 supportingText = {
@@ -85,51 +83,61 @@ fun LoginScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = uiState.confirmPassword,
+                onValueChange = { signUpViewModel.onConfirmPasswordChanged(it) },
+                label = { Text("Confirm Password") },
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Done // For the last field
+                ),
+                isError = uiState.confirmPasswordError != null,
+                supportingText = {
+                    uiState.confirmPasswordError?.let {
+                        Text(
+                            it,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
             Spacer(modifier = Modifier.height(24.dp))
 
-            if (uiState.isLoginInProgress) {
+            if (uiState.isSignUpInProgress) {
                 CircularProgressIndicator()
             } else {
                 Button(
                     onClick = {
                         focusManager.clearFocus()
-                        loginViewModel.attemptLogin()
+                        signUpViewModel.attemptSignUp()
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = !uiState.isLoginInProgress
+                    enabled = !uiState.isSignUpInProgress
                 ) {
-                    Text("Login")
+                    Text("Sign Up")
                 }
             }
 
-            uiState.loginError?.let { error ->
+            uiState.signUpError?.let { error ->
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    error,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
-                )
+                Text(error, color = MaterialTheme.colorScheme.error)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
             TextButton(onClick = {
-                if (!uiState.isLoginInProgress) {
-                    navController.navigate(Screen.SignUp.route) {
-
+                if (!uiState.isSignUpInProgress) {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.SignUp.route) { inclusive = true }
                     }
                 }
             }) {
-                Text("Don't have an account? Sign Up")
+                Text("Already have an account? Login")
             }
-        }
-
-        if (uiState.showPreferredDeviceDialog) {
-            PreferredDeviceDialog(
-                onDismiss = { loginViewModel.onPreferredDeviceDialogDismissed() },
-                onConfirm = { isPreferred ->
-                    loginViewModel.onPreferredDeviceConfirmed(isPreferred)
-                }
-            )
         }
     }
 }
