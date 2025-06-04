@@ -1,5 +1,6 @@
 package com.codecrew.app
 
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.core.app.ActivityCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -35,6 +37,27 @@ class MainActivity : ComponentActivity() {
             if (startDestination != null) {
                 YourApp(startDestination = startDestination!!)
             }
+        }
+        getAllPermissions()
+    }
+
+    private fun getAllPermissions() {
+        val requiredPermissions = mutableListOf<String>().apply {
+            add(android.Manifest.permission.RECORD_AUDIO)
+            add(android.Manifest.permission.CAMERA)
+            add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            add(android.Manifest.permission.READ_PHONE_STATE)
+        }
+        val permissionsToAskFor = mutableListOf<String>()
+
+        for (requiredPermission in requiredPermissions) {
+            if (ActivityCompat.checkSelfPermission(this@MainActivity, requiredPermission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToAskFor.add(requiredPermission)
+            }
+        }
+
+        if (permissionsToAskFor.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this@MainActivity, permissionsToAskFor.toTypedArray(), 1);
         }
     }
 }
