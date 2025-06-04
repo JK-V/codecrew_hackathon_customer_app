@@ -16,23 +16,22 @@ class CallAgentGenerator private constructor(
 ) {
 
     fun getCallAgent(): CallAgent {
-        /*val callAgentOption = CallAgentOptions()
-        val telecomeManagerOptions = TelecomManagerOptions(phoneID)
-        callAgentOption.setTelecomManagerOptions(telecomeManagerOptions)*/
-
         val callClientOptions = CallClientOptions()
         val callClient = CallClient(callClientOptions)
         val communicationTokenCredential = CommunicationTokenCredential(userToken)
-        //val callAgent = callClient.createCallAgent(context, communicationTokenCredential, callAgentOption).get()
         val callAgent = callClient.createCallAgent(context, communicationTokenCredential).get()
 
         callAgent.addOnIncomingCallListener(object: IncomingCallListener {
             override fun onIncomingCall(incomingCall: IncomingCall?) {
                 Log.d("ACS", "onIncomingCall = ${incomingCall?.callerInfo?.displayName}")
+                Log.d("ACS", "onIncomingCall = ${incomingCall?.toString()}")
+
+                //incomingCall?.accept(context)
+                incomingCall?.reject()
 
                 incomingCall?.addOnCallEndedListener(object: PropertyChangedListener{
                     override fun onPropertyChanged(args: PropertyChangedEvent?) {
-
+                        Log.d("ACS", "onPropertyChanged = ${args.toString()}")
                     }
                 })
             }
@@ -42,8 +41,7 @@ class CallAgentGenerator private constructor(
     }
 
     companion object {
-        private const val userToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IkRCQTFENTczNEY1MzM4QkRENjRGNjA4NjE2QTQ5NzFCOTEwNjU5QjAiLCJ4NXQiOiIyNkhWYzA5VE9MM1dUMkNHRnFTWEc1RUdXYkEiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmE2N2ZmMDcwLTJjODItNDBhOS1hNjc3LTJkM2MxNmU3MmJlMV8wMDAwMDAyNy1kYTI5LTlmNzUtZDY4YS0wODQ4MjIwMDkwOTEiLCJzY3AiOjE3OTIsImNzaSI6IjE3NDkwMjk0ODUiLCJleHAiOjE3NDkxMTU4ODUsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6ImNoYXQsdm9pcCIsInJlc291cmNlSWQiOiJhNjdmZjA3MC0yYzgyLTQwYTktYTY3Ny0yZDNjMTZlNzJiZTEiLCJyZXNvdXJjZUxvY2F0aW9uIjoidW5pdGVkc3RhdGVzIiwiaWF0IjoxNzQ5MDI5NDg1fQ.pJWoyllzJ2HIiTBLaoo5fP0dayJw-NFOVUuiMPbU_QjO5cLu3yGru4qmifxSDAwKi3vzkZ5YspFAEenYBZSsuiIdUqoNqnTOtQ4T1ng8qXhMeOK5LH_Fb_-WmmM3KGY-PZvlAGLAmqXwszYZfmg2HvEcmAMxZvXsfNADwYhdAs53yriQFNnaNEc591OMh8UumsrSwzC8iYPtja1oZ4OAM0wVchUXeaAvibXw3AwRdEBlF6s6ooUEyZvF19C4rr7cfTPGNHbRPzgpdC9CNrp3duYpaagz3tmXscWeywCtPq7cS-UOLU2s_KOYjY5RLhOVhXpZudp3AGWilOX6WfX9sw"
-        //const val phoneID = "abcdefghijklmnopqrstuvwxyz"
+        private const val userToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IkRCQTFENTczNEY1MzM4QkRENjRGNjA4NjE2QTQ5NzFCOTEwNjU5QjAiLCJ4NXQiOiIyNkhWYzA5VE9MM1dUMkNHRnFTWEc1RUdXYkEiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmE2N2ZmMDcwLTJjODItNDBhOS1hNjc3LTJkM2MxNmU3MmJlMV8wMDAwMDAyNy1kYzhjLTBhM2ItMDJjMy01OTNhMGQwMGM0ODEiLCJzY3AiOjE3OTIsImNzaSI6IjE3NDkwNjk0ODkiLCJleHAiOjE3NDkxNTU4ODksInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6InZvaXAiLCJyZXNvdXJjZUlkIjoiYTY3ZmYwNzAtMmM4Mi00MGE5LWE2NzctMmQzYzE2ZTcyYmUxIiwicmVzb3VyY2VMb2NhdGlvbiI6InVuaXRlZHN0YXRlcyIsImlhdCI6MTc0OTA2OTQ4OX0.VQ3pwK77Ftm9Ko_wsJV0BuscDb5TfMPGVI4Me0YaR1UAamSbYlTcyZ7rJHpq98NLyImbPZoDxTEnvbSxvkklsJK-FsnUAUx2R0tng6ocpMLAp1pC3xH3iHSeDFmN6JMBSMStyc4Ij_jjs1B7Um17KBXuyK-EtgFFiwEJlHOGgbLuuJdLLC8BhO8xGKV0ueaJMc4sDAhpHsY9-ENi3rdMFptml_JCz8b6FBv8hV9TG_mO6nsqcUslGVzl4WbusVLoMbCCxYHTE7V8bOCXTqyv-ZxsUAg_Uuq_RBEd0DSUoY7-yG4EjXfaVX1IV6xcnOcM2pONKxCUjHO9jlIe4QFsHg"
 
         @Volatile
         private var INSTANCE: CallAgentGenerator? = null
