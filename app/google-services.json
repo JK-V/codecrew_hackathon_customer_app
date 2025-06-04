@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "902449624366",
+    "project_id": "codecrew-917ff",
+    "storage_bucket": "codecrew-917ff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:902449624366:android:60288d63461e5501b8b6bf",
+        "android_client_info": {
+          "package_name": "com.codecrew.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2EGp3VHpSTwGgweABnw6GerW3HFXxMJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Code Crew</string>
+    <string name="home_page_title">Home</string>
+    <string name="manages_pref_settings">Manage Preferences</string>
 </resources>
