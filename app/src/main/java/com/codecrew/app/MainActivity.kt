@@ -13,9 +13,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.codecrew.app.login.LoginScreen
-/*import com.codecrew.app.utils.UserPreferences
+/*import com.codecrew.app.utils.UserPreferences*/
 import com.codecrew.app.navigation.Screen
-import com.codecrew.app.sing_up.SignUpScreen*/
+import com.codecrew.app.sing_up.SignUpScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
 fun YourApp(startDestination: String) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = startDestination) {
-        /*composable(Screen.SignUp.route) {
+        composable(Screen.SignUp.route) {
             SignUpScreen(navController = navController)
         }
         composable(Screen.Login.route) {
@@ -54,6 +54,6 @@ fun YourApp(startDestination: String) {
         }
         composable(Screen.ManageDevices.route) {
             ManageDevicesScreen(navController = navController)
-        }*/
+        }
     }
 }
