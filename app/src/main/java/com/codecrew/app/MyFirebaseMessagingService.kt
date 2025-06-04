@@ -31,7 +31,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 CallAgentGenerator.getInstance(this).getCallAgent().handlePushNotification(
                     PushNotificationInfo.fromMap(remoteMessage.data))
             } catch (e: Exception) {
-                println("Something went wrong while handling the Incoming Calls Push Notifications.")
+                Log.d(TAG,"Something went wrong while handling the Incoming Calls Push Notifications. ${e.message}")
             }
 
         }
