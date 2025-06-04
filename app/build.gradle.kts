@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.material.icons.core) // Or the latest version
     implementation(libs.androidx.material.icons.extended) // Or the latest version
+    implementation(libs.azure.communication.calling)
     // Or latest version
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

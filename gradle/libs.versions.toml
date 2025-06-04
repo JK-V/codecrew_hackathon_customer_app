@@ -1,5 +1,6 @@
 [versions]
 agp = "8.10.1"
+azureCommunicationCalling = "2.13.1"
 datastorePreferences = "1.1.1"
 kotlin = "2.0.21"
 coreKtx = "1.10.1"
@@ -21,6 +22,7 @@ androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-view
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core", version.ref = "materialIconsCore" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsCore" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+azure-communication-calling = { module = "com.azure.android:azure-communication-calling", version.ref = "azureCommunicationCalling" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
