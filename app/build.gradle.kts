@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -56,6 +57,17 @@ dependencies {
     implementation(libs.androidx.material.icons.core) // Or the latest version
     implementation(libs.androidx.material.icons.extended) // Or the latest version
     implementation(libs.azure.communication.calling)
+
+    // This allows you to manage Firebase library versions centrally
+    implementation(platform("com.google.firebase:firebase-bom:33.0.0")) // Use the latest BoM version
+
+    // Add the dependency for the Firebase Cloud Messaging library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-messaging")
+
+    // It's also highly recommended to add Analytics for delivery reporting
+    implementation("com.google.firebase:firebase-analytics")
+
     // Or latest version
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
