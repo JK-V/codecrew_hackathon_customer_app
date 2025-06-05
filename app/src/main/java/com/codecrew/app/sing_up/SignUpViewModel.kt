@@ -91,6 +91,8 @@ class SignUpViewModel(
                     )
                     UserPreferences.setHasCompletedSignUp(appApplication.applicationContext, true)
 
+                    UserPreferences.setCustId(appApplication.applicationContext, response.custId)
+
                     _uiState.update {
                         it.copy(
                             isSignUpInProgress = false,

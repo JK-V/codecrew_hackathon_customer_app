@@ -11,10 +11,16 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.codecrew.app.model.CustomerData
+import com.codecrew.app.model.RetrofitClient
+import com.codecrew.app.utils.UserPreferences
+import kotlinx.coroutines.launch
 
 data class Device(val id: String, val name: String, var isPreferred: Boolean = false)
 
@@ -29,11 +35,26 @@ class ManageDevicesViewModel : ViewModel() {
     private val _preferredDeviceId = mutableStateOf(_devices.firstOrNull { it.isPreferred }?.id)
     val preferredDeviceId: State<String?> = _preferredDeviceId
 
-    fun setPreferredDevice(deviceId: String) {
+    fun setPreferredDevice(deviceId: String, custId: String?) {
         _devices.forEach { device ->
             device.isPreferred = device.id == deviceId
         }
         _preferredDeviceId.value = deviceId
+        val customerApi = RetrofitClient.create()
+
+        viewModelScope.launch {
+            try {
+                val response: CustomerData = customerApi.updatePreferDevice(
+                    custId = custId,
+                    customerData = CustomerData(
+                        preferredDeviceFlag = true,
+                        deviceId = deviceId
+                    )
+                )
+            } catch (e: Exception) {
+                // Handle the exception
+            }
+        }
     }
 
     fun addDevice(name: String) {
@@ -51,6 +72,7 @@ fun ManageDevicesScreen(
 ) {
     val devices = manageDevicesViewModel.devices
     val preferredDeviceId by manageDevicesViewModel.preferredDeviceId
+    val custId = UserPreferences.getCustId(LocalContext.current.applicationContext)
 
     Scaffold(
         topBar = {
@@ -81,7 +103,9 @@ fun ManageDevicesScreen(
                         DeviceItem(
                             device = device,
                             isSelected = device.id == preferredDeviceId,
-                            onSelected = { manageDevicesViewModel.setPreferredDevice(device.id) }
+                            onSelected = {
+                                manageDevicesViewModel.setPreferredDevice(device.id, custId)
+                            }
                         )
                         Divider()
                     }

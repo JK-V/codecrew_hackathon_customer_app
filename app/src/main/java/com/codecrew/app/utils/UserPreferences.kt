@@ -9,6 +9,7 @@ object UserPreferences {
     private const val PREFS_NAME = "user_app_prefs"
     private const val KEY_REGISTERED_EMAIL = "registered_email"
     private const val KEY_HAS_COMPLETED_SIGN_UP = "has_completed_sign_up"
+    private const val KEY_CUST_ID = "cust_ID"
 
 
     private fun getPreferences(context: Context): SharedPreferences {
@@ -25,6 +26,14 @@ object UserPreferences {
 
     fun setHasCompletedSignUp(context: Context, hasCompleted: Boolean) {
         getPreferences(context).edit { putBoolean(KEY_HAS_COMPLETED_SIGN_UP, hasCompleted) }
+    }
+
+    fun setCustId(context: Context, custId: String?) {
+        getPreferences(context).edit { putString(KEY_CUST_ID, custId) }
+    }
+
+    fun getCustId(context: Context): String? {
+        return getPreferences(context).getString(KEY_CUST_ID, null)
     }
 
     fun hasCompletedSignUp(context: Context): Boolean {
