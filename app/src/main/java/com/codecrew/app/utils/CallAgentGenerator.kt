@@ -21,7 +21,7 @@ class CallAgentGenerator private constructor(
         val communicationTokenCredential = CommunicationTokenCredential(userToken)
         val callAgent = callClient.createCallAgent(context, communicationTokenCredential).get()
 
-        callAgent.addOnIncomingCallListener(object: IncomingCallListener {
+        /*callAgent.addOnIncomingCallListener(object: IncomingCallListener {
             override fun onIncomingCall(incomingCall: IncomingCall?) {
                 Log.d("ACS", "onIncomingCall = ${incomingCall?.callerInfo?.displayName}")
                 Log.d("ACS", "onIncomingCall = ${incomingCall?.toString()}")
@@ -35,13 +35,13 @@ class CallAgentGenerator private constructor(
                     }
                 })
             }
-        })
+        })*/
 
         return callAgent
     }
 
     companion object {
-        private const val userToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IkRCQTFENTczNEY1MzM4QkRENjRGNjA4NjE2QTQ5NzFCOTEwNjU5QjAiLCJ4NXQiOiIyNkhWYzA5VE9MM1dUMkNHRnFTWEc1RUdXYkEiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmE2N2ZmMDcwLTJjODItNDBhOS1hNjc3LTJkM2MxNmU3MmJlMV8wMDAwMDAyNy1kZTRmLTYyZjctZTNjNy01OTNhMGQwMGY4OTAiLCJzY3AiOjE3OTIsImNzaSI6IjE3NDkwOTkwNjkiLCJleHAiOjE3NDkxODU0NjksInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6ImNoYXQsdm9pcCIsInJlc291cmNlSWQiOiJhNjdmZjA3MC0yYzgyLTQwYTktYTY3Ny0yZDNjMTZlNzJiZTEiLCJyZXNvdXJjZUxvY2F0aW9uIjoidW5pdGVkc3RhdGVzIiwiaWF0IjoxNzQ5MDk5MDY5fQ.H4ZJ5ZfXGAli5FKQGsKm-EaC9C7tWfak2_vAZUGUnLTSL0Co7UgipdQMM3yilMPKxy54V-_bgzp4jrpqzdNPWGOS7BbJ6suFhEHNNePA7sRL0LNunaZFI1pjEXIODxOqSDz9i2HWcZBMGqBjjt8pF9U67ibJ1cdOBis3_PmEjCvmDOHbpFjFqxBZbohH8RKsmR_ZcoKUn66ZEWO5WAEAhi1aQvHg7qgtVirqdaG0wsTvGYV56gIrfZxGkgIZHN3mC5rXgm_aDp3U2524e1iZ4jGnguWMOqIszXse2_Rx_78xfAwtqXMA3ifpUcen6mC0QDR8nYzomuRCsZj-l7ldVg"
+        const val userToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IkRCQTFENTczNEY1MzM4QkRENjRGNjA4NjE2QTQ5NzFCOTEwNjU5QjAiLCJ4NXQiOiIyNkhWYzA5VE9MM1dUMkNHRnFTWEc1RUdXYkEiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmE2N2ZmMDcwLTJjODItNDBhOS1hNjc3LTJkM2MxNmU3MmJlMV8wMDAwMDAyNy1kZTZmLTNlMTMtY2U0Ni0wNGJkNDU2MGY0NGYiLCJzY3AiOjE3OTIsImNzaSI6IjE3NDkxMDExNTYiLCJleHAiOjE3NDkxODc1NTYsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6ImNoYXQsdm9pcCIsInJlc291cmNlSWQiOiJhNjdmZjA3MC0yYzgyLTQwYTktYTY3Ny0yZDNjMTZlNzJiZTEiLCJyZXNvdXJjZUxvY2F0aW9uIjoidW5pdGVkc3RhdGVzIiwiaWF0IjoxNzQ5MTAxMTU2fQ.tDsY53KoPy1KiqIXJXDOXpkXWf1wDZ0mmS9iTDzFlbLgnDaUAaUCKV0DDQ3uUVo7WJe7goXhp7fTm4TmhmqGX3w9N3HRP31o22-ExaDfsc4yZoqqQBmSqZ_sESfRW4IIJsMoSPj-L-ezGK6OzMAcnHZ8LhDO1WTgdcwD5zUO2n4VZtb9uL_a52CHyjWJe0WmE2aMFsL_M4rgYZC-D75AH-3HmFbZVAfTNIhbODkH_jfkkLzlfX0YjIe04LKpvYCRB5QLJD9XOAZ0v2zPkZQd4pUJe59r82f_FhWI4nAfRDWe25ZMGoEysUwPs2U_dIOeouZKxhkz_EHVfClPFp5dDQ"
 
         @Volatile
         private var INSTANCE: CallAgentGenerator? = null

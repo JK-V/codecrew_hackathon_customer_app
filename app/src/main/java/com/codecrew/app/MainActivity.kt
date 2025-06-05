@@ -11,29 +11,33 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.azure.android.communication.calling.CallAgent
-import com.azure.android.communication.calling.CallAgentOptions
-import com.azure.android.communication.calling.CallClient
-import com.azure.android.communication.calling.CallClientOptions
-import com.azure.android.communication.calling.TelecomManagerOptions
-import com.azure.android.communication.common.CommunicationTokenCredential
+import com.codecrew.app.audio.AcsManager
+import com.codecrew.app.audio.AudioCallScreen
+import com.codecrew.app.audio.AudioCallViewModel
+import com.codecrew.app.audio.AudioCallViewModelFactory
+import com.codecrew.app.audio.incomingcall.IncomingCallScreen
+import com.codecrew.app.audio.incomingcall.IncomingCallViewModel
+import com.codecrew.app.audio.incomingcall.IncomingCallViewModelFactory
 import com.codecrew.app.login.LoginScreen
-import com.codecrew.app.model.CustomerData
-import com.codecrew.app.model.RetrofitClient
 import com.codecrew.app.utils.UserPreferences
 import com.codecrew.app.navigation.Screen
 import com.codecrew.app.sing_up.SignUpScreen
 import com.codecrew.app.utils.CallAgentGenerator
+import com.codecrew.app.utils.CallAgentGenerator.Companion.userToken
 import com.google.firebase.messaging.FirebaseMessaging
 
-class MainActivity : ComponentActivity() {
+class MainActivity() : ComponentActivity() {
+    private lateinit var acsManager: AcsManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        acsManager = AcsManager.getInstance(this)
         setContent {
             var startDestination by remember { mutableStateOf<String?>(null) }
 
@@ -47,10 +51,16 @@ class MainActivity : ComponentActivity() {
             }
 
             if (startDestination != null) {
-                YourApp(startDestination = startDestination!!)
+                YourApp(startDestination = startDestination!!, acsManager)
             }
         }
         getAllPermissions()
+
+        // Obtain AcsManager instance (singleton or from DI)
+
+
+        // Observe AcsManager for navigation triggers globally or in a launching Activity
+
     }
 
     private fun getAllPermissions() {
@@ -94,14 +104,48 @@ class MainActivity : ComponentActivity() {
             val token = task.result
             Log.d("ACS", "Current FCM Token: $token")
 
-            CallAgentGenerator.getInstance(this).getCallAgent().registerPushNotification(token)
+            //CallAgentGenerator.getInstance(this).getCallAgent().registerPushNotification(token)
+
+            AcsManager.getInstance(this).createCallAgent(acsToken = userToken, fcmToken = token)
         }
     }
 }
 
 @Composable
-fun YourApp(startDestination: String) {
+fun YourApp(startDestination: String, acsManager: AcsManager) {
     val navController = rememberNavController()
+    LaunchedEffect(Unit) {
+
+        // This is a simplified example. In a real app, this observation
+        // might be in your MainActivity or a component that lives as long as the app.
+        acsManager.callUiState.collect { state ->
+            if (state.incomingCall != null && navController.currentDestination?.route !=Screen.IncomingScreen.route) {
+                // Only navigate if we're not already there to avoid loops
+                // and there's an actual incoming call being signaled by AcsManager
+                navController.navigate(Screen.IncomingScreen.route) {
+                    // Avoid multiple copies of the incoming call screen
+                    launchSingleTop = true
+                }
+            } else if (state.activeCall != null && state.incomingCall == null &&
+                navController.currentDestination?.route !=Screen.AudioScreen.route) {
+                // If a call becomes active (e.g., after accepting or making one)
+                // and we're not on the audio call screen, navigate there.
+                // This handles the transition after accepting from IncomingCallScreen.
+                navController.navigate(Screen.AudioScreen.route) {
+                    // Potentially pop IncomingCallScreen off the stack
+                    popUpTo("incomingCallScreenRoute") { inclusive = true }
+                    launchSingleTop = true
+                }
+            } else if (state.incomingCall == null && state.activeCall == null &&
+                (navController.currentDestination?.route == Screen.IncomingScreen.route ||
+                        navController.currentDestination?.route == "audioCallScreenRoute") ) {
+                // If no incoming or active call, and we are on one of the call screens,
+                // consider popping back. This logic needs care to avoid unwanted navigation.
+                // For instance, if the call ended, AudioCallScreen's ViewModel might handle its own dismissal.
+                // If an incoming call was rejected/missed, IncomingCallScreen handles it.
+            }
+        }
+    }
     NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.SignUp.route) {
             SignUpScreen(navController = navController)
@@ -114,6 +158,57 @@ fun YourApp(startDestination: String) {
         }
         composable(Screen.ManageDevices.route) {
             ManageDevicesScreen(navController = navController)
+        }
+        composable(Screen.AudioScreen.route) {
+            val context = LocalContext.current.applicationContext
+
+
+            val audioCallViewModel: AudioCallViewModel =
+                viewModel(
+                factory = AudioCallViewModelFactory(context, acsManager)
+            )
+            AudioCallScreen(
+                viewModel = audioCallViewModel,
+                onCallEnded = {
+                    // navController.popBackStack()
+                    // Or navigate to a post-call summary, etc.
+                    // This logic needs to be robustly tied to the call actually ending.
+                }
+            )
+        }
+        composable(Screen.IncomingScreen.route) {
+            val context = LocalContext.current.applicationContext
+            val incomingCallViewModel: IncomingCallViewModel = viewModel(
+                factory = IncomingCallViewModelFactory(acsManager)
+            )
+            IncomingCallScreen(
+                viewModel = incomingCallViewModel,
+                onCallAccepted = {
+                    // The LaunchedEffect observing acsManager.callUiState for an activeCall
+                    // should handle navigating to the audioCallScreenRoute.
+                    // So, this lambda might not even need to explicitly navigate here if that global observer is robust.
+                    // For now, let's assume direct navigation intent:
+                    // navController.navigate("audioCallScreenRoute") {
+                    //    popUpTo("incomingCallScreenRoute") { inclusive = true }
+                    //    launchSingleTop = true
+                    // }
+                    // If the global LaunchedEffect for navigation is active, this specific navigation
+                    // might become redundant or could even conflict. It's often better to have a single
+                    // source of truth for navigation based on AcsManager's state.
+                },
+                onCallRejectedOrMissed = {
+                    if (navController.previousBackStackEntry != null) {
+                        navController.popBackStack()
+                    } else {
+                        // If no back stack (e.g., app launched directly into call),
+                        // navigate to a default screen or close.
+                        // navController.navigate("yourMainAppScreenRoute") {
+                        //     popUpTo("incomingCallScreenRoute") { inclusive = true }
+                        // }
+                        // This part depends on your app's desired behavior.
+                    }
+                }
+            )
         }
     }
 }

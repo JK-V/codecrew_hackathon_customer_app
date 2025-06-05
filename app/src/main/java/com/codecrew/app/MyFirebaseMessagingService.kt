@@ -2,6 +2,7 @@ package com.codecrew.app
 
 import android.util.Log
 import com.azure.android.communication.calling.PushNotificationInfo
+import com.codecrew.app.audio.AcsManager
 import com.codecrew.app.utils.CallAgentGenerator
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -17,6 +18,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
      */
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Log.d(TAG, "From: ${remoteMessage.from}")
+        //val userToken = "eyJhbGciOiJSUzI1NiIsImtpZCI6IkRCQTFENTczNEY1MzM4QkRENjRGNjA4NjE2QTQ5NzFCOTEwNjU5QjAiLCJ4NXQiOiIyNkhWYzA5VE9MM1dUMkNHRnFTWEc1RUdXYkEiLCJ0eXAiOiJKV1QifQ.eyJza3lwZWlkIjoiYWNzOmE2N2ZmMDcwLTJjODItNDBhOS1hNjc3LTJkM2MxNmU3MmJlMV8wMDAwMDAyNy1kZTU5LWJhNWUtYTg0Mi0wNGJkNDU2MGViNDIiLCJzY3AiOjE3OTIsImNzaSI6IjE3NDkwOTk3NDYiLCJleHAiOjE3NDkxODYxNDYsInJnbiI6ImFtZXIiLCJhY3NTY29wZSI6ImNoYXQsdm9pcCIsInJlc291cmNlSWQiOiJhNjdmZjA3MC0yYzgyLTQwYTktYTY3Ny0yZDNjMTZlNzJiZTEiLCJyZXNvdXJjZUxvY2F0aW9uIjoidW5pdGVkc3RhdGVzIiwiaWF0IjoxNzQ5MDk5NzQ2fQ.tFuUmdZ2d5KQiZ8nz27yiQNBuJqJWXbE29FLXq_uSg7p1pQ74K40avbH3sTcuOMIgfJx5id9WGhRJhKS5q8oXeBieYj1ZsRV2CluEFAYpLvrgi-fOJVqJ1SAAtBco8vy8c6MWcBhLb8CH0UkxqVHzdo2P3ID35lDaFX6kRqugpBZ83TSXmbE_5YtwK___5H51QOjUhJp_s7-FOgsEArFzHJrvjfHO92CAuN6tXA_1JgydkPhyLHUrI4cSSJyXc3LMR_8I32qLr9D2wMSCeHjIhrwaswNxa0q4HmCrdanNm5PtcQ-BicCXP87cAO188TlxCefnIvC4wTdDuT5hMFmVA"
 
         Log.d(TAG, "Message data payload: " + remoteMessage.data)
         // Check if message contains a data payload.
@@ -28,8 +30,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     callAgent.handlePushNotification(notification).get()*/
 
 
-                CallAgentGenerator.getInstance(this).getCallAgent().handlePushNotification(
+                /*CallAgentGenerator.getInstance(this).getCallAgent().handlePushNotification(
+                    PushNotificationInfo.fromMap(remoteMessage.data))*/
+                AcsManager.getInstance(this).callAgent.handlePushNotification(
                     PushNotificationInfo.fromMap(remoteMessage.data))
+
             } catch (e: Exception) {
                 Log.d(TAG,"Something went wrong while handling the Incoming Calls Push Notifications. ${e.message}")
             }
@@ -57,7 +62,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendRegistrationToServer(token: String?) {
-        CallAgentGenerator.getInstance(this).getCallAgent().registerPushNotification(token)
+        //CallAgentGenerator.getInstance(this).getCallAgent().registerPushNotification(token)
     }
 
     /**
